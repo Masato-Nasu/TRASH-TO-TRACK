@@ -2,6 +2,8 @@
 
 **Delete data. Refine what remains into music.**
 
+![TRASH TO TRACK v0.6.0](docs/screenshot.jpg)
+
 TRASH TO TRACK is an Android file-cleanup experience where actually deleted local data becomes music credit.
 
 ## Core rule
