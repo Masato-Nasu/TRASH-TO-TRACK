@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TrashToTrack" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryVariant">@color/accent</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/muted</item>
+        <item name="android:alertDialogTheme">@style/Theme.TrashToTrack.AlertDialog</item>
+    </style>
+
+    <style name="Theme.TrashToTrack.AlertDialog" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowBackground">@color/review_bg</item>
+        <item name="android:textColorPrimary">@color/review_text</item>
+        <item name="android:textColorSecondary">@color/review_meta</item>
+        <item name="android:colorAccent">@color/dialog_action</item>
+    </style>
+</resources>

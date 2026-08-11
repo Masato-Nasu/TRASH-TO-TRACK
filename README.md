@@ -1,87 +1,99 @@
 # TRASH TO TRACK v0.6.0
 
-**Delete data. Turn the afterimage into music.**
+**Delete data. Refine what remains into music.**
 
-TRASH TO TRACK is an Android app whose main interaction is deliberately simple:
+TRASH TO TRACK is an Android file-cleanup experience where actually deleted local data becomes music credit.
 
-1. Find files you genuinely no longer need.
-2. Long-press to select them.
-3. Tap **DELETE → TRACK CREDIT**.
-4. Review the exact files before permanent deletion.
-5. Only successfully deleted bytes enter **TRASH BANK**.
-6. Every **25 MB** unlocks one full TRACK.
-7. Generate 1 / 3 / ALL available TRACKS with Gemini/Lyria BYOK.
+## Core rule
 
-The file manager exists only to support that flow. Moving files does **not** earn TRACK CREDIT.
+- Delete real local files from inside TRASH TO TRACK.
+- Successfully deleted bytes enter **TRASH BANK**.
+- **25 MB = 1 TRACK**.
+- TRACK generation uses the ESSENCE associated with the remaining credit.
+- A TRACK consumes its 25 MB credit **only after the MP3 has been generated and saved successfully**.
 
-## v0.6.0 interaction reset
+## v0.6.0 reset / review
 
-- Normal tap never selects a file.
-  - Folder: open it.
-  - File: safe preview / metadata only.
-- Long-press starts selection mode; further taps add/remove items.
-- Selection mode shows only the actions that matter: **MOVE** and **DELETE → TRACK CREDIT**.
-- Empty folders can be deleted separately; folders never earn music credit.
-- MOVE is contained inside TRASH TO TRACK: **MOVE → browse destination → MOVE HERE**.
-- Rightward flick in the file list goes exactly one folder level up.
-- Android edge-back / Back uses the same folder-up behavior.
-- At STORAGE root, Back/edge-swipe does **not** close the app.
-- The gesture listener observes without consuming touch events, so scrolling, tapping, and long-press selection keep working.
-- The FULL FILE ACCESS button disappears after access is granted.
-- TRASH BANK and TRACK generation are visually primary; file-management controls stay secondary.
+This version was reviewed against the accumulated 0.2–0.5 code and removes old overlapping file-picker / move paths.
 
-## Delete safety
+### Important fixes
 
-Deletion is intentionally conservative:
+- **ESSENCE is now consumed with TRACK credit.** Older builds reduced credit but kept old ESSENCE forever; that could make previously deleted material keep influencing future music. v0.6.0 reconciles legacy BANK data on first run and then consumes the exact 25 MB ESSENCE slice after each successful TRACK.
+- **Deletion is journaled before the source file is touched.** If the process stops after deletion but before BANK commit, the pending deletion is recovered automatically on the next launch, so a deleted file cannot silently lose its TRACK credit.
+- Failed, cancelled, blocked, unsaved, or interrupted generation consumes **neither credit nor ESSENCE**.
+- Old retained ESSENCE is reconciled to the amount of credit that actually remains.
+- File moving is a single in-app filesystem flow. No Android document-tree picker is used for MOVE.
+- Saving TRACKS uses the in-app folder chooser.
+- Android Back / edge-back navigates one folder upward. At STORAGE root it does not close the app.
+- Normal folder navigation clears ordinary delete selections so hidden selections cannot remain armed in another folder.
+- MOVE mode is the only exception: selected move sources are deliberately held while you browse to the destination.
+- Default browsing is safe: tap opens a folder / previews a file; **long-press starts selection**.
+- No SELECT ALL deletion shortcut.
+- Delete uses a readable two-stage review and flags files modified within the last 7 days as RECENT.
+- Empty folders have a separate delete action and never create TRACK credit.
+- Standard top-level media/system folders (Music, Pictures, Download, DCIM, Android, etc.) are protected from being moved/deleted as whole folders; open them and operate on their contents instead.
+- Delete/review/settings/save-folder dialogs use a dedicated high-contrast light theme so text remains readable.
+- Background generation continues with a foreground service + partial wake lock and self-clears stale generation state.
+- Network/DNS retries remain enabled.
 
-- Normal browsing cannot delete or select anything.
-- Files must first be deliberately selected with a long-press.
-- A high-contrast **REVIEW BEFORE DELETE** screen lists every file, size and location.
-- Files changed within the last 7 days are marked **RECENT**.
-- A final permanent-delete confirmation follows the review.
-- TRACK CREDIT is added only after actual deletion succeeds.
-- Failed/cancelled deletions earn no credit.
+## File manager flow
 
-## Music / TRASH BANK
+### Browse
 
-- **25 MB deleted = 1 TRACK credit**.
-- Credits accumulate; generation can happen later.
-- Full-length Lyria TRACKS can be generated 1 / 3 / ALL at a time.
-- TRACK generation runs in a foreground service and can continue with the screen off.
-- Successful MP3 save happens before its 25 MB credit is consumed.
-- Stale/frozen generation state self-recovers; active generation can be stopped without consuming unfinished credit.
-- DNS/network loss uses bounded retries instead of immediately killing a batch.
+- Tap folder: open it.
+- Tap file: safe preview / metadata only.
+- Android edge-back / Back: go up one folder.
+- `‹`: go up one folder.
+- `+`: create a folder in the current folder.
+
+### Select trash
+
+- Long-press a file to begin selection.
+- Tap additional items to add/remove them.
+- `DELETE → TRACK CREDIT` reviews only deletable files.
+- You get credit only for bytes that were actually deleted.
+
+### Move
+
+- Long-press and select one or more files/folders.
+- Tap `MOVE`.
+- Browse inside TRASH TO TRACK to the destination.
+- Tap `MOVE HERE`.
+- MOVE never adds TRACK credit.
+
+### Generate
+
+- When TRASH BANK contains at least 25 MB, tap `MAKE TRACKS`.
+- Choose genre (including TRIP HOP), quantity (1 / 3 / ALL when available), and an in-app save folder.
+- Default quantity is **1 TRACK**.
+- Tracks save directly into the selected folder; no extra child folder is created automatically.
 
 ## Privacy
 
-- Gemini API key is BYOK and stored with Android Keystore-backed encryption.
-- **PRIVATE MODE is ON by default.**
-- PRIVATE MODE keeps/sends only abstract ESSENCE metadata, not source photos or document wording.
-- Interactions requests explicitly use `store:false`.
-- Optional RICH ESSENCE MODE must be explicitly enabled in Settings.
+PRIVATE MODE is the default.
 
-## File access
+- No source image bytes or document wording are sent in PRIVATE MODE.
+- Local abstract measurements / metadata are used as musical cues.
+- Gemini/Lyria requests explicitly set `store:false`.
+- Even in RICH ESSENCE MODE, filenames and folder paths are intentionally omitted from the music prompt.
+- Gemini API Key is BYOK and stored with Android Keystore-backed encryption.
+- Optional RICH ESSENCE MODE can be explicitly enabled in Settings.
 
-For the in-app file manager to browse and manage shared storage on Android 11+, TRASH TO TRACK requests Android's one-time **All files access** permission. The Android Settings permission screen is the only unavoidable system handoff. After permission is granted, browsing, multi-selection, moving, folder creation, delete review, and TRACK destination selection are handled inside TRASH TO TRACK.
+## Permissions
 
-## Build / install (Windows PowerShell)
+Android 11+ requires **All files access** for this app to function as an in-app file manager. The Android Settings permission page is the only OS screen required for file access; after permission is granted, browsing, selection, moving, folder creation, deletion, and save-folder choice stay inside TRASH TO TRACK.
+
+## Build / install on Windows
+
+Open PowerShell in this project folder:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
 .\INSTALL_DEBUG.ps1
 ```
 
-The script builds `TRASH-TO-TRACK-v0.6.0-debug.apk` and installs it to an ADB-connected device.
+The build script auto-creates `local.properties` when the Android SDK exists at the standard `%LOCALAPPDATA%\Android\Sdk` path. `INSTALL_DEBUG.ps1` always rebuilds first, so it cannot accidentally install a stale APK from an older source state. Java compilation is forced to UTF-8 for consistent Windows builds.
 
-## First test after update
+## Safety
 
-Use disposable files first:
-
-1. Open a nested folder.
-2. Right-flick / Android Back → confirm exactly one level up and no app exit at STORAGE root.
-3. Tap a file → confirm preview only.
-4. Long-press three files → confirm all three remain selected.
-5. Move them to another folder with **MOVE → MOVE HERE**.
-6. Select disposable files → **DELETE → TRACK CREDIT** → review → delete.
-7. Confirm TRASH BANK increases only by bytes actually deleted.
-8. Generate one TRACK and confirm MP3 output.
+This app permanently deletes files. Test with disposable files first. Always use the delete review screen before confirming.

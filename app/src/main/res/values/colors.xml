@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#080A0A</color>
+    <color name="panel">#111515</color>
+    <color name="panel_2">#151B18</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#070909</color>
+    <color name="muted">#E0E5E2</color>
+    <color name="line">#3B4540</color>
+    <color name="accent">#C9FF36</color>
+    <color name="danger">#FF6666</color>
+    <color name="selected">#1B251B</color>
+    <color name="review_bg">#FFFFFF</color>
+    <color name="review_text">#111111</color>
+    <color name="review_meta">#444444</color>
+    <color name="dialog_action">#355F00</color>
+</resources>
